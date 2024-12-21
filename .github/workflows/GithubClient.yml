@@ -1,28 +1,33 @@
 name: GithubClient # should match cproj
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["ci"]
+    branches: [main,master]
+    types:
+      - completed
     paths:
       - 'src/GithubClient/**'
       - '.github/workflows/GithubClient.yml'
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  
+  #pull_request:
+  #  types: [closed]
+  #  branches:
+  #    - main
 
 env:
   DOTNET_VERSION: '9.x' # The .NET SDK version to use
+    
+permissions:
+  contents: write # to be able to publish a GitHub release
+  packages: write # for pushing GitHub Nuget packages
 
 jobs:
   release:
-    #needs: [ci]
     runs-on: ubuntu-latest
-    name: Build NuGet package
-    permissions:
-      contents: write # to be able to publish a GitHub release
-      packages: write # for pushing GitHub Nuget packages
+    name: Release NuGet package
+    needs: [ci]
+    #if: ${{ github.event.workflow_run.conclusion != 'failure' }}
 
     steps:
       - name: Checkout repository
@@ -38,8 +43,8 @@ jobs:
 
       - name: Build solution and generate NuGet package
         run: |
-          cd src/${{ github_workflow }}
+          cd src/GithubClient
           dotnet pack -c Release -o out --include-symbols -p:SymbolPackageFormat=snupkg
 
       - name: Push package to GitHub registry
-        run: dotnet nuget push ./src/${{ github_workflow }}/out/*.nupkg
+        run: dotnet nuget push ./src/GithubClient/out/*.nupkg
