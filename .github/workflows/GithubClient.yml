@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'src/GithubClient/**'
+      - '.github/workflows/GithubClient.yml'
   pull_request:
     types: [closed]
     branches:
