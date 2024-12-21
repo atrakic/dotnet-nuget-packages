@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Text;
+using Octokit;
+
 using GithubClient.Interfaces;
 using GithubClient.Model;
-using Octokit;
 
 namespace GithubClient
 {

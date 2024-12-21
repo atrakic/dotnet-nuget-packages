@@ -32,7 +32,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Repository.Branch.GetAll("drdk", repository);
+            return await _githubClient.Repository.Branch.GetAll(_githubClient.User.Current().Result.Login, repository);
         }
 
         public async Task<Branch> GetBranch(string repository, string branch, string githubToken = null)
@@ -40,7 +40,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Repository.Branch.Get("drdk", repository, branch);
+            return await _githubClient.Repository.Branch.Get(_githubClient.User.Current().Result.Login, repository, branch);
         }
 
         public async Task<Repository> GetRepository(string repository, string githubToken = null)
@@ -49,7 +49,7 @@ namespace GithubClient
             _githubClient.Credentials = tokenAuth;
             try
             {
-                return await _githubClient.Repository.Get("drdk", repository);
+                return await _githubClient.Repository.Get(_githubClient.User.Current().Result.Login, repository);
             }
             catch (NotFoundException)
             {
@@ -94,7 +94,7 @@ namespace GithubClient
                 });
             }
 
-            return await _githubClient.Git.Tree.Create("drdk", repository, tree);
+            return await _githubClient.Git.Tree.Create(_githubClient.User.Current().Result.Login, repository, tree);
         }
 
         public async Task<TreeResponse> GetTree(string repository, string reference, bool recursive, string githubToken = null)
@@ -103,9 +103,9 @@ namespace GithubClient
             _githubClient.Credentials = tokenAuth;
             if (recursive)
             {
-                return await _githubClient.Git.Tree.GetRecursive("drdk", repository, reference);
+                return await _githubClient.Git.Tree.GetRecursive(_githubClient.User.Current().Result.Login, repository, reference);
             }
-            return await _githubClient.Git.Tree.Get("drdk", repository, reference);
+            return await _githubClient.Git.Tree.Get(_githubClient.User.Current().Result.Login, repository, reference);
         }
 
         public async Task<Commit> CreateCommit(string repository, string tree, string message, string parent, string githubToken = null)
@@ -115,7 +115,7 @@ namespace GithubClient
 
             var commit = new NewCommit(message, tree, parent);
 
-            return await _githubClient.Git.Commit.Create("drdk", repository, commit);
+            return await _githubClient.Git.Commit.Create(_githubClient.User.Current().Result.Login, repository, commit);
         }
 
         public async Task<Reference> CreateReference(string repository, string reference, string sha, string githubToken = null)
@@ -125,7 +125,7 @@ namespace GithubClient
 
             var newReference = new NewReference(reference, sha);
 
-            return await _githubClient.Git.Reference.Create("drdk", repository, newReference);
+            return await _githubClient.Git.Reference.Create(_githubClient.User.Current().Result.Login, repository, newReference);
         }
 
         public async Task<Reference> UpdateReference(string repository, string reference, string sha, string githubToken = null)
@@ -133,7 +133,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Git.Reference.Update("drdk", repository, reference, new ReferenceUpdate(sha));
+            return await _githubClient.Git.Reference.Update(_githubClient.User.Current().Result.Login, repository, reference, new ReferenceUpdate(sha));
         }
 
         public async Task<Reference> GetReference(string repository, string reference, string githubToken = null)
@@ -141,7 +141,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Git.Reference.Get("drdk", repository, reference);
+            return await _githubClient.Git.Reference.Get(_githubClient.User.Current().Result.Login, repository, reference);
         }
 
         public async Task<byte[]> GetRepositoryContent(string repository, string contentPath, string branch = null, string githubToken = null)
@@ -153,11 +153,11 @@ namespace GithubClient
             {
                 if (branch == null)
                 {
-                    return await _githubClient.Repository.Content.GetRawContent("drdk", repository,
+                    return await _githubClient.Repository.Content.GetRawContent(_githubClient.User.Current().Result.Login, repository,
                         contentPath);
                 }
 
-                return await _githubClient.Repository.Content.GetRawContentByRef("drdk", repository, contentPath, branch);
+                return await _githubClient.Repository.Content.GetRawContentByRef(_githubClient.User.Current().Result.Login, repository, contentPath, branch);
 
             }
             catch (NotFoundException)
@@ -171,7 +171,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Repository.Create("drdk", new NewRepository(name)
+            return await _githubClient.Repository.Create(_githubClient.User.Current().Result.Login, new NewRepository(name)
             {
                 AutoInit = true,
                 Private = true
@@ -183,7 +183,7 @@ namespace GithubClient
             var tokenAuth = await GetCredentials(githubToken);
             _githubClient.Credentials = tokenAuth;
 
-            return await _githubClient.Repository.Status.GetAll("drdk", repository, sha);
+            return await _githubClient.Repository.Status.GetAll(_githubClient.User.Current().Result.Login, repository, sha);
         }
     }
 }
