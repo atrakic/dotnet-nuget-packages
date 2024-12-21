@@ -1,0 +1,39 @@
+name: NuGet GithubClient
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/GithubClient/**'
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+env:
+  DOTNET_VERSION: '9.x' # The .NET SDK version to use
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build NuGet package
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          source-url: https://nuget.pkg.github.com/${{ github.actor }}/index.json
+        env:
+          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Build solution and generate NuGet package
+        run: |  
+          cd src/GithubClient
+          dotnet pack -c Release -o out --include-symbols -p:SymbolPackageFormat=snupkg
+      
+      - name: Push package to GitHub registry
+        run: dotnet nuget push ./out/*.nupkg
