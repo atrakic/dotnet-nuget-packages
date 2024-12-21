@@ -1,4 +1,4 @@
-name: NuGet GithubClient
+name: GithubClient # should match cproj
 
 on:
   push:
@@ -16,9 +16,14 @@ env:
   DOTNET_VERSION: '9.x' # The .NET SDK version to use
 
 jobs:
-  build:
+  release:
+    #needs: [ci]
     runs-on: ubuntu-latest
     name: Build NuGet package
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      packages: write # for pushing GitHub Nuget packages
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,9 +37,9 @@ jobs:
           NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: Build solution and generate NuGet package
-        run: |  
-          cd src/GithubClient
+        run: |
+          cd src/${{ github_workflow }}
           dotnet pack -c Release -o out --include-symbols -p:SymbolPackageFormat=snupkg
-      
+
       - name: Push package to GitHub registry
-        run: dotnet nuget push ./src/GithubClient/out/*.nupkg
+        run: dotnet nuget push ./src/${{ github_workflow }}/out/*.nupkg
